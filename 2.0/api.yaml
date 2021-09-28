@@ -111,8 +111,44 @@ x-tagGroups:
        - Сахилгын зөрчлийн гишүүн
        - Сахилгын зөрчлийн үндэслэл
        - Сахилгын зөрчлийн үе шат
+    -  
+      name: КАЛЕНДАР
+      tags: 
+       - Календар
+       - Календарын арга хэмжээ
+       - Календарын арга хэмжээний өдрүүд
+   
+    -    
+      name: АЖЛЫН ЦАГИЙН ХУВААРЬ
+      tags: 
+       - Ажлын цагийн хуваарь
+       - Ажлын цагийн хуваарийн ээлж
+       - Ажлын цагийн хуваарийн нөөц   
+       - Ажлын цагийн хуваарийн календар                         
 tags:
-    -
+    -   
+        name: Календар
+        description: 'test'
+    -   
+        name: Календарын арга хэмжээ
+        description: 'test'
+    -    
+        name: Календарын арга хэмжээний өдрүүд
+        description: 'test'
+    -     
+        name: Ажлын цагийн хуваарь
+        description: 'test'
+    -        
+        name: Ажлын цагийн хуваарийн ээлж
+        description: 'test'
+    -   
+        name: Ажлын цагийн хуваарийн нөөц 
+        description: 'test'
+    -   
+        name: Ажлын цагийн хуваарийн календар
+        description: 'test'
+    -    
+
         name: Объектын дата модел
         description: '
                         <p>Дараах диаграмаар ХНУМС-ийн объектын дата моделийн дээд түвшний ойлголтын загварыг харуулж байна. Зураг дээр даран шинэ таб нээж зургийн хэмжээг өөрчлөн харж болно.</p>
@@ -392,7 +428,1302 @@ tags:
         name: Цалингийн үнэлгээний утга
         description: 'Цалингийн үнэлгээний утгын мэдээлэл. Веб сервисийн бүтэцтэй холбоотой нэмэлт мэдээллийг <a href="#tag/Obuektyn-data-model">Объектын дата модел</a> хэсгээс харна уу.'
 
+
 paths:
+
+    /calendars:
+        get:
+            operationId: getCalendars
+            summary: Календарын жагсаалт 
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendars'
+            produces:
+                - application/json
+            tags:
+                - Календар
+            x-internal-id: hemis-api-2.0-calendars-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/calendars"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/calendars")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();
+        post:
+            operationId: createCalendars
+            summary: Календар үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/calendars-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendars-item'
+            produces:
+                - application/json
+            tags:
+                - Календар
+            x-internal-id: hemis-api-2.0-calendars-post     
+    /calendars/{id}:   
+        get:
+            operationId: getCalendars
+            summary: Календарын мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendars-item'
+            produces:
+                - application/json
+            tags:
+                - Календар
+            x-internal-id: hemis-api-2.0-calendars-{id}-get            
+        patch:
+            operationId: updateCalendars
+            summary: Календарын мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/calendars-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendars-item'
+            produces:
+                - application/json
+            tags:
+                - Календар
+            x-internal-id: hemis-api-2.0-calendars-{id}-patch
+        delete:
+            operationId: deleteCalendars
+            summary: Календар устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Календар
+            x-internal-id: hemis-api-2.0-calendars-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string
+
+    /calendars/{id}/{child}/events:
+ 
+        get:
+            operationId: getCalendarsEvents
+            summary: Календарын арга хэмжээний жагсаалт 
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendarsEvents'
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээ
+            x-internal-id: hemis-api-2.0-calendarsEvents-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/calendarsEvents"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/calendarsEvents")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();
+        post:
+            operationId: createCalendarsEvents
+            summary: Календарын арга хэмжээ үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/calendarsEvents-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendarsEvents-item'
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээ 
+            x-internal-id: hemis-api-2.0-calendarsEvents-post     
+    /calendars/events/{id}:   
+        get:
+            operationId: getCalendarsEvents
+            summary: Календарын арга хэмжээний мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendarsEvents-item'
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээ 
+            x-internal-id: hemis-api-2.0-calendarsEvents-{id}-get            
+        patch:
+            operationId: updateCalendarsEvents
+            summary: Календарын арга хэмжээний мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/calendarsEvents-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/calendarsEvents-item'
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээ
+            x-internal-id: hemis-api-2.0-calendarsEvents-{id}-patch
+        delete:
+            operationId: deleteCalendarsEvents
+            summary: Календарын арга хэмжээ устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээ
+            x-internal-id: hemis-api-2.0-calendarsEvents-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string
+    /calendars/{id}/{child}/events/{id}/{child}/dates: 
+        get:
+            operationId: getEventsDates
+            summary: Календарын арга хэмжээний өдрүүдийн мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/eventsDates-item'
+            produces:
+                - application/json
+            tags:
+                - Календарын арга хэмжээний өдрүүд
+            x-internal-id: hemis-api-2.0-eventsDates-{id}-get     
+
+    /schedules:
+
+        get:
+            operationId: getSchedules
+            summary: Ажлын цагийн хуваарийн жагсаалт
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedules'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарь
+            x-internal-id: hemis-api-2.0-schedules-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/schedules"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/schedules")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();
+        post:
+            operationId: createSchedules
+            summary: Ажлын цагийн хуваарь үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedules-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedules-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарь 
+            x-internal-id: hemis-api-2.0-schedules-post   
+    /schedules/{id}:   
+        get:
+            operationId: getSchedules
+            summary: Ажлын цагийн хуваарийн мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedules-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарь  
+            x-internal-id: hemis-api-2.0-schedules-{id}-get            
+        patch:
+            operationId: updateSchedules
+            summary: Ажлын цагийн хуваарийн мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedules-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedules-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарь 
+            x-internal-id: hemis-api-2.0-schedules-{id}-patch
+        delete:
+            operationId: deleteSchedules
+            summary: Ажлын цагийн хуваарь устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарь 
+            x-internal-id: hemis-api-2.0-schedules-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string    
+    /schedules/{id}/child/shifts:
+
+        get:
+            operationId: getSchedulesShifts
+            summary: Ажлын цагийн хуваарийн ээлжийн жагсаалт
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesShifts'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж
+            x-internal-id: hemis-api-2.0-schedulesShifts-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/schedulesShifts"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/schedulesShifts")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();    
+        post:
+            operationId: createSchedulesShifts
+            summary: Ажлын цагийн хуваарийн ээлж үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesShifts-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesShifts-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж 
+            x-internal-id: hemis-api-2.0-schedulesShifts-post   
+    /schedules/{id}/child/shifts/{id}:   
+        get:
+            operationId: getSchedulesShifts
+            summary: Ажлын цагийн хуваарийн ээлжийн мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesShifts-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж   
+            x-internal-id: hemis-api-2.0-schedulesShifts-{id}-get            
+        patch:
+            operationId: updateSchedulesShifts
+            summary: Ажлын цагийн хуваарийн ээлжийн мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesShifts-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesShifts-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж 
+            x-internal-id: hemis-api-2.0-schedulesShifts-{id}-patch
+        delete:
+            operationId: deleteSchedulesShifts
+            summary: Ажлын цагийн хуваарийн ээлж устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж  
+            x-internal-id: hemis-api-2.0-schedulesShifts-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string     
+    /schedules/{id}/child/shifts/{id}/child/dates:   
+        get:
+            operationId: getSchedulesShiftsDates
+            summary: Ажлын цагийн хуваарийн ээлжийн өдрүүдийн мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/shiftsDates-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн ээлж   
+            x-internal-id: hemis-api-2.0-shiftsDates-{id}-get    
+            
+    /schedules/{id}/child/resources:
+
+        get:
+            operationId: getSchedulesShifts
+            summary: Ажлын цагийн хуваарийн нөөцийн жагсаалт
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesResources'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн нөөц
+            x-internal-id: hemis-api-2.0-schedulesResources-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/schedulesResources"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/schedulesResources")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();    
+        post:
+            operationId: createSchedulesResources
+            summary: Ажлын цагийн хуваарийн нөөц үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesResources-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesResources-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн нөөц
+            x-internal-id: hemis-api-2.0-schedulesResources-post   
+    /schedules/{id}/child/resources/{id}:   
+        get:
+            operationId: getSchedulesResources
+            summary: Ажлын цагийн хуваарийн нөөцийн мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesResources-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн нөөц   
+            x-internal-id: hemis-api-2.0-schedulesResources-{id}-get            
+        patch:
+            operationId: updateSchedulesResources
+            summary: Ажлын цагийн хуваарийн нөөцийн мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesResources-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesResources-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн нөөц  
+            x-internal-id: hemis-api-2.0-schedulesResources-{id}-patch
+        delete:
+            operationId: deleteSchedulesResources
+            summary: Ажлын цагийн хуваарийн нөөц устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн нөөц  
+            x-internal-id: hemis-api-2.0-schedulesResources-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string   
+            
+    /schedules/{id}/child/calendars:
+
+        get:
+            operationId: getSchedulesCalendars
+            summary: Ажлын цагийн хуваарийн календарын жагсаалт
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн календар
+            x-internal-id: hemis-api-2.0-schedulesCalendars-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/schedulesCalendars"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/schedulesCalendars")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();  
+        post:
+            operationId: createSchedulesCalendars
+            summary: Ажлын цагийн хуваарийн календар үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн календар
+            x-internal-id: hemis-api-2.0-schedulesCalendars-post   
+    /schedules/{id}/child/calendars/{id}:   
+        get:
+            operationId: getSchedulesCalendars
+            summary: Ажлын цагийн хуваарийн календарын мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн календар  
+            x-internal-id: hemis-api-2.0-schedulesCalendars-{id}-get            
+        patch:
+            operationId: updateSchedulesCalendars
+            summary: Ажлын цагийн хуваарийн календарын мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/schedulesCalendars-item'
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн календар  
+            x-internal-id: hemis-api-2.0-schedulesCalendars-{id}-patch
+        delete:
+            operationId: deleteSchedulesCalendars
+            summary: Ажлын цагийн хуваарийн календар устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Ажлын цагийн хуваарийн календар  
+            x-internal-id: hemis-api-2.0-schedulesCalendars-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string                                                                                                                                                            
     /legalEntities:
         get:
             operationId: getLegalEntities
@@ -8671,7 +10002,7 @@ paths:
                 '
                 required: true
                 in: path
-                type: string     
+                type: string                     
 definitions:
     singularQuery:
         type: object
@@ -8747,6 +10078,1085 @@ definitions:
                 type: string
                 description: 'Нөөцийн линкний төрлийг заана. Жишээ нь: item, collection, attachment.'
                 title: Нөөцийн линкний төрөл
+    calendars:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/calendars-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'
+    calendars-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            CalendarId:
+                format: int64
+                type: integer
+                description: Календарын ID
+                title: Календарын ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            CalendarCode:
+                title: Календарын код
+                maxLength: 30
+                type: string
+                description: Календарын код
+            CalendarName:
+                title: Календарын нэр
+                maxLength: 240
+                type: string
+                description: Календарын нэр 
+            CalendarDesc:
+                title: Календарын тайлбар 
+                maxLength: 4000
+                type: string
+                description: Календарын тайлбар       
+            CalendarStatus:
+                title: Календарын төлөв    
+                maxLength: 30
+                type: string
+                description: Календарын төлөв          
+            ActionType:
+                title: Үйлдлийн төрөл    
+                maxLength: 30
+                type: string
+                description: Үйлдлийн төрөл     
+            ActionId:
+                format: int64
+                type: integer
+                description: Үйлдлийн ID
+                title: Үйлдлийн ID     
+            ActionReasonId:
+                format: int64
+                type: integer
+                description: Үйлдлийн шалтгааны ID
+                title: Үйлдлийн шалтгааны ID   
+            ActionDate:
+                format: date-time
+                type: string
+                description: Үйлдэл хийсэн огноо
+                title: Үйлдэл хийсэн огноо                                                                                                                                                                     
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object     
+    calendarsEvents:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/calendarsEvents-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'
+    calendarsEvents-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            CalendarEventId:
+                format: int64
+                type: integer
+                description: Календарын арга хэмжээний ID
+                title: Календарын арга хэмжээний ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            CalendarId:
+                format: int64
+                type: integer
+                description: Календарын ID
+                title: Календарын ID                
+            EventType:
+                title: Арга хэмжээний төрөл
+                maxLength: 30
+                type: string
+                description: Арга хэмжээний төрөл
+            EventCode:
+                title: Арга хэмжээний код
+                maxLength: 30
+                type: string
+                description: Арга хэмжээний код
+            EventName:
+                title: Арга хэмжээний нэр
+                maxLength: 240
+                type: string
+                description: Арга хэмжээний нэр       
+            EventDesc:
+                title: Арга хэмжээний тайлбар  
+                maxLength: 4000
+                type: string
+                description: Арга хэмжээний тайлбар       
+            EventStartDate:
+                format: date-time
+                type: string
+                description: Арга хэмжээний эхлэх өдөр
+                title: Арга хэмжээний эхлэх өдөр
+            EventEndDate:
+                format: date-time
+                type: string
+                description: Арга хэмжээний дуусах өдөр
+                title: Арга хэмжээний дуусах өдөр   
+            EventAllDayFlag:
+                title: Бүтэн өдрийн арга хэмжээ эсэх
+                maxLength: 1
+                type: string
+                description: Бүтэн өдрийн арга хэмжээ эсэх 
+            EventStartTime:
+                title: Арга хэмжээ эхлэх цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 14:00.  
+                maxLength: 5
+                type: string
+                description: Арга хэмжээ эхлэх цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 14:00.    
+            EventEndTime:
+                title: Арга хэмжээ дуусах цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 21:00. 
+                maxLength: 5
+                type: string
+                description: Арга хэмжээ дуусах цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 21:00.    
+            EventRepeat:
+                title: Арга хэмжээний давтамж, NONE - Давтамжгүй, EVERY_DAY - Өдөр бүр, EVERY_WEEK - Долоо хоног бүр, EVERY_MONTH - Сар бүр, EVERY_YEAR - Жил бүр
+                maxLength: 30
+                type: string
+                description: Арга хэмжээний тайлбар     
+            EventEndRepeat: 
+                title: Давтамж дуусгах нөхцөл, NEVER - Хэзээ ч дуусахгүй, AFTER - Дараа, ON_DATE - Өдөр хүртэл
+                maxLength: 30
+                type: string
+                description: Арга хэмжээний тайлбар     
+            EventEndFrequency:
+                format: int64
+                type: integer
+                description: Давтамж дуусгах давталтын тоо. Зөвхөн EVENT_END_REPEAT="AFTER" үед ашиглагдана.
+                title: Давтамж дуусгах давталтын тоо. Зөвхөн EVENT_END_REPEAT="AFTER" үед ашиглагдана.   
+            EventEndOnDate:
+                format: date-time
+                type: string
+                description: Давтамж дуусгах өдөр. Зөвхөн EVENT_END_REPEAT = "ON_DATE" үед ашиглагдана.
+                title: Давтамж дуусгах өдөр. Зөвхөн EVENT_END_REPEAT = "ON_DATE" үед ашиглагдана.   
+            EventStatus:
+                title: Арга хэмжээний төлөв
+                maxLength: 30
+                type: string
+                description: Арга хэмжээний төлөв                                                                                                                                            
+            ActionType:
+                title: Үйлдлийн төрөл    
+                maxLength: 30
+                type: string
+                description: Үйлдлийн төрөл     
+            ActionId:
+                format: int64
+                type: integer
+                description: Үйлдлийн ID
+                title: Үйлдлийн ID     
+            ActionReasonId:
+                format: int64
+                type: integer
+                description: Үйлдлийн шалтгааны ID
+                title: Үйлдлийн шалтгааны ID   
+            ActionDate:
+                format: date-time
+                type: string
+                description: Үйлдэл хийсэн огноо
+                title: Үйлдэл хийсэн огноо                                                                                                                                                                     
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object       
+    eventsDates-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            CalendarEventDateId:
+                format: int64
+                type: integer
+                description: Календарын арга хэмжээний өдрийн ID
+                title: Календарын арга хэмжээний өдрийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            CalendarId:
+                format: int64
+                type: integer
+                description: Календарын ID
+                title: Календарын ID
+            CalendarEventId:
+                format: int64
+                type: integer
+                description: Календарын арга хэмжээний ID
+                title: Календарын арга хэмжээний ID                                
+            EventDate:
+                format: date-time
+                type: string
+                description: Календарын арга хэмжээний өдөр
+                title: Календарын арга хэмжээний өдөр
+            EventDateStartTime:
+                title: Арга хэмжээ эхлэх цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 14:00.  
+                maxLength: 5
+                type: string
+                description: Арга хэмжээ эхлэх цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 14:00.    
+            EventDateEndTime:
+                title: Арга хэмжээ дуусах цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 21:00. 
+                maxLength: 5
+                type: string
+                description: Арга хэмжээ дуусах цаг. Зөвхөн бүтэн өдрийн биш үед ашиглана. Утга оруулахдаа HH24:MI форматттай байна. Жишээ нь 21:00.    
+            PriorEventDateID:
+                format: int64
+                type: integer
+                description: Өмнөх арга хэмжээний өдрийн ID
+                title: Өмнөх арга хэмжээний өдрийн ID    
+            PriorEventDate:
+                format: date-time
+                type: string
+                description: Өмнөх арга хэмжээний өдөр
+                title: Өмнөх арга хэмжээний өдөр    
+            NextEventDateID:
+                format: int64
+                type: integer
+                description: Дараагийн арга хэмжээний өдрийн ID
+                title: Дараагийн арга хэмжээний өдрийн ID    
+            NextEventDate:
+                format: date-time
+                type: string
+                description: Дараагийн арга хэмжээний өдөр
+                title: Дараагийн арга хэмжээний өдөр                                                                                                                                                                                                  
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object             
+    schedulesShifts:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/schedulesShifts-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link' 
+    schedulesShifts-item:   
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            ScheduleId:
+                format: int64
+                type: integer
+                description: Ажлын цагийн хуваарийн ID
+                title: Ажлын цагийн хуваарийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            ScheduleCode:
+                title: Ажлын цагийн хуваарийн код
+                maxLength: 30
+                type: string
+                description: Ажлын цагийн хуваарийн код         
+            ScheduleName:
+                title: Ажлын цагийн хуваарийн нэр
+                maxLength: 240
+                type: string
+                description: Ажлын цагийн хуваарийн нэр        
+            ScheduleDesc:
+                title: Ажлын цагийн хуваарийн тайлбар
+                maxLength: 500
+                type: string
+                description: Ажлын цагийн хуваарийн тайлбар                                     
+            ScheduleStartDate:
+                format: date-time
+                type: string
+                description: Ажлын цагийн хуваарь эхлэх өдөр
+                title: Ажлын цагийн хуваарь эхлэх өдөр
+            ScheduleEndDate:
+                format: date-time
+                type: string
+                description: Ажлын цагийн хуваарь дуусах өдөр
+                title: Ажлын цагийн хуваарь дуусах өдөр     
+            ScheduleStatus:
+                title: Ажлын цагийн хуваарийн төлөв 
+                maxLength: 30
+                type: string
+                description: Ажлын цагийн хуваарийн төлөв 
+            ShiftType:
+                title: Ээлжийн төрөл
+                maxLength: 30
+                type: string
+                description: Ээлжийн төрөл    
+            WorkdayCycle:
+                format: int64
+                type: integer
+                description: Ажлын өдрийн цикль (хоногоор)
+                title: Ажлын өдрийн цикль (хоногоор)             
+            WorkdayCycleType:
+                title: Ажлын өдрийн циклийн төрөл 
+                maxLength: 30
+                type: string
+                description: Ажлын өдрийн циклийн төрөл                                                                                                                                                                                                                                                                               
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object 
+    schedulesCalendars:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/schedulesCalendars-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'      
+    schedulesCalendars-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            ScheduleCalendarId:
+                format: int64
+                type: integer
+                description: Ажлын цагийн хуваарийн календарын ID
+                title: Ажлын цагийн хуваарийн календарын ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            ScheduleId:
+                format: int64
+                type: integer
+                description: Ажлын хуваарийн ID
+                title: Ажлын хуваарийн ID          
+            CalendarId:
+                format: int64
+                type: integer
+                description: Календарын ID
+                title: Календарын ID                                               
+            DisplaySequence:
+                format: int64
+                type: integer
+                description: Дэлгэцэнд харуулах дараалал
+                title: Дэлгэцэнд харуулах дараалал                                                                                                                                                                                                                                                                                                             
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object                               
+    schedulesResources:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/schedulesResources-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'                        
+    schedulesResources-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            ScheduleResourceId:
+                format: int64
+                type: integer
+                description: Ажлын цагийн хуваарийн нөөцийн ID
+                title: Ажлын цагийн хуваарийн нөөцийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            ScheduleId:
+                format: int64
+                type: integer
+                description: Ажлын хуваарийн ID
+                title: Ажлын хуваарийн ID          
+            ResourceType:
+                title: Нөөцийн төрөл
+                maxLength: 30
+                type: string
+                description: Нөөцийн төрөл
+            ResourceId:
+                format: int64
+                type: integer
+                description: Нөөцийн ID
+                title: Нөөцийн ID                                                 
+            StartShiftId:
+                format: int64
+                type: integer
+                description: Эхлэх ээлжийн ID
+                title: Эхлэх ээлжийн ID                
+            StartDate:
+                format: date-time
+                type: string
+                description: Ээлж эхлэх огноо
+                title: Ээлж эхлэх огноо     
+            EndDate:
+                format: date-time
+                type: string
+                description: Ээлж дуусах огноо
+                title: Ээлж дуусах огноо    
+            ActionType:
+                title: Үйлдлийн төрөл    
+                maxLength: 30
+                type: string
+                description: Үйлдлийн төрөл     
+            ActionId:
+                format: int64
+                type: integer
+                description: Үйлдлийн ID
+                title: Үйлдлийн ID     
+            ActionReasonId:
+                format: int64
+                type: integer
+                description: Үйлдлийн шалтгааны ID
+                title: Үйлдлийн шалтгааны ID   
+            ActionDate:
+                format: date-time
+                type: string
+                description: Үйлдэл хийсэн огноо
+                title: Үйлдэл хийсэн огноо                                                                                                                                                                                                                                                                                                
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object                                                   
+    shiftsDates:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/shiftsDates-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'  
+    shiftsDates-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            ScheduleDateId:
+                format: int64
+                type: integer
+                description: Ажлын хуваарийн хуваарьт өдрийн ID
+                title: Ажлын хуваарийн хуваарьт өдрийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            ScheduleId:
+                format: int64
+                type: integer
+                description: Ажлын хуваарийн ID
+                title: Ажлын хуваарийн ID       
+            ScheduledDate:
+                format: date-time
+                type: string
+                description: Ажлын хуваарьт өдөр
+                title: Ажлын хуваарьт өдөр    
+            ShiftId:
+                format: int64
+                type: integer
+                description: Ажлын хуваарийн хуваарьт өдрийнID
+                title: Ажлын хуваарийн хуваарьт өдрийнID   
+            PriorDateId:
+                format: int64
+                type: integer
+                description: Өмнөх ажлын хуваарьт өдрийн ID
+                title: Өмнөх ажлын хуваарьт өдрийн ID                                                 
+            PriorDate:
+                format: date-time
+                type: string
+                description: Өмнөх ажлын хуваарьт өдөр
+                title: Өмнөх ажлын хуваарьт өдөр
+            NextDateId:
+                format: int64
+                type: integer
+                description: Дараагийн ажлын хуваарьт өдрийн ID
+                title: Дараагийн ажлын хуваарьт өдрийн ID                  
+            NextDate:
+                format: date-time
+                type: string
+                description: Дараагийн ажлын хуваарьт өдөр
+                title: Дараагийн ажлын хуваарьт өдөр                                                                                                                                                                                                                                                                      
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object                                                                   
+    schedules:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/schedules-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'     
+    schedules-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            ScheduleId:
+                format: int64
+                type: integer
+                description: Ажлын цагийн хуваарийн ID
+                title: Ажлын цагийн хуваарийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            ScheduleCode:
+                title: Ажлын цагийн хуваарийн код
+                maxLength: 30
+                type: string
+                description: Ажлын цагийн хуваарийн код         
+            ScheduleName:
+                title: Ажлын цагийн хуваарийн нэр
+                maxLength: 240
+                type: string
+                description: Ажлын цагийн хуваарийн нэр        
+            ScheduleDesc:
+                title: Ажлын цагийн хуваарийн тайлбар
+                maxLength: 500
+                type: string
+                description: Ажлын цагийн хуваарийн тайлбар                                     
+            ScheduleStartDate:
+                format: date-time
+                type: string
+                description: Ажлын цагийн хуваарь эхлэх өдөр
+                title: Ажлын цагийн хуваарь эхлэх өдөр
+            ScheduleEndDate:
+                format: date-time
+                type: string
+                description: Ажлын цагийн хуваарь дуусах өдөр
+                title: Ажлын цагийн хуваарь дуусах өдөр     
+            ScheduleStatus:
+                title: Ажлын цагийн хуваарийн төлөв 
+                maxLength: 30
+                type: string
+                description: Ажлын цагийн хуваарийн төлөв 
+            ShiftType:
+                title: Ээлжийн төрөл
+                maxLength: 30
+                type: string
+                description: Ээлжийн төрөл    
+            WorkdayCycle:
+                format: int64
+                type: integer
+                description: Ажлын өдрийн цикль (хоногоор)
+                title: Ажлын өдрийн цикль (хоногоор)             
+            WorkdayCycleType:
+                title: Ажлын өдрийн циклийн төрөл 
+                maxLength: 30
+                type: string
+                description: Ажлын өдрийн циклийн төрөл          
+            ActionType:
+                title: Үйлдлийн төрөл    
+                maxLength: 30
+                type: string
+                description: Үйлдлийн төрөл     
+            ActionId:
+                format: int64
+                type: integer
+                description: Үйлдлийн ID
+                title: Үйлдлийн ID     
+            ActionReasonId:
+                format: int64
+                type: integer
+                description: Үйлдлийн шалтгааны ID
+                title: Үйлдлийн шалтгааны ID   
+            ActionDate:
+                format: date-time
+                type: string
+                description: Үйлдэл хийсэн огноо
+                title: Үйлдэл хийсэн огноо                                                                                                                                                                                                                                                                         
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object                                  
     legalEntities:
         type: object
         properties:
@@ -8777,7 +11187,7 @@ definitions:
                 description: Объектын мэдээлэлтэй холбоотой линкүүд.
                 type: array
                 items:
-                    $ref: '#/definitions/link'
+                    $ref: '#/definitions/link'                       
     legalEntities-item:
         properties:
             LegalEntityId:
