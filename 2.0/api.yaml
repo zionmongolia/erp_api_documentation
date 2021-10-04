@@ -117,14 +117,21 @@ x-tagGroups:
        - Календар
        - Календарын арга хэмжээ
        - Календарын арга хэмжээний өдрүүд
-   
+       
     -    
       name: АЖЛЫН ЦАГИЙН ХУВААРЬ
       tags: 
        - Ажлын цагийн хуваарь
        - Ажлын цагийн хуваарийн ээлж
        - Ажлын цагийн хуваарийн нөөц   
-       - Ажлын цагийн хуваарийн календар                         
+       - Ажлын цагийн хуваарийн календар 
+
+    -    
+      name: ОСЛЫН БҮРТГЭЛ
+      tags: 
+       - Ослын бүртгэл
+
+                   
 tags:
     -   
         name: Календар
@@ -147,8 +154,10 @@ tags:
     -   
         name: Ажлын цагийн хуваарийн календар
         description: 'test'
+    -   
+        name: Ослын бүртгэл
+        description: 'test'
     -    
-
         name: Объектын дата модел
         description: '
                         <p>Дараах диаграмаар ХНУМС-ийн объектын дата моделийн дээд түвшний ойлголтын загварыг харуулж байна. Зураг дээр даран шинэ таб нээж зургийн хэмжээг өөрчлөн харж болно.</p>
@@ -1723,7 +1732,210 @@ paths:
                     '
                     required: true
                     in: path
-                    type: string                                                                                                                                                            
+                    type: string  
+    /incidents:
+        get:
+            operationId: getIncidents
+            summary: Ослын бүртгэлийн жагсаалт
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Сервер зөвхөн тухайн нөөцийн датаг буцаана. (Жишээ нь: Ямарч линк агуулсан хэсэг буцаагдахгүй)'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+                - 
+                    name: limit
+                    description: Энэ параметр нь нөөцийн цуглуулгаас заагдсан тоогоор нөөцийг хязгаарлан буцаана. Гэхдээ энэ хязгаар нь боломжит нөөцийн тоогоос хэтрэхгүй байна.
+                    in: query
+                    type: integer
+                - 
+                    name: offset
+                    description: Энэ параметр нь нөөцийн цуглуулганы эхлэх байршлыг заахад ашиглагдана. Үндсэн утга нь 0 байна.
+                    in: query
+                    type: integer
+                - 
+                    name: totalResults
+                    description: 'Энэ параметр нь нийт нөөцийн тоог буцаахад ашиглагдана. "?totalResults=true" гэж ашиглана. Үндсэн утга нь "false" байна.'
+                    in: query
+                    type: boolean
+                - 
+                    name: q
+                    description: 'Энэ параметр нь нөөцийг шүүх, филтердэх нөхцөл болж ашиглагдана. Жишээ нь: ?q=legalEntityType&gt;=10 and &lt;= 30;Location!=UB <br><br>Ашиглах формат: ?q=expression1;expression2'
+                    in: query
+                    type: string
+                - 
+                    name: orderBy
+                    description: 'Энэ параметр нь нөөцийг тодорхойлсон баганаар дарааллуулахад ашиглагдана. Параметрийн утга нь <strong>;</strong> аар ялгарах ба дарааллын тохиргоо ("asc" эсвэл "desc") нь хоорондоо <strong>:</strong> аар ялгарна. Үндсэн утга нь "asc" байна. Жишээ нь: ?orderBy=field1:asc,field2:desc'
+                    in: query
+                    type: string
+                - 
+                    name: finder
+                    description: 'Урьдчилан тодорхойлсон хайлт. <br><br>Ашиглах формат: ?finder=&lt;finderName&gt;;&lt;variableName&gt;=&lt;variableValue&gt;,&lt;variableName2&gt;=&lt;variableValue2&gt;<br><br>Жишээ нь: ?finder=FindlegalEntityByRegistration;RegistrationNumber=100045,EffectiveDate=SYSDATE гэж ашиглана.'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/incidents'
+            produces:
+                - application/json
+            tags:
+                - Ослын бүртгэл
+            x-internal-id: hemis-api-2.0-incidents-get
+            x-code-samples:
+                -  
+                    lang: cURL
+                    source: '
+                            curl -X POST -H "Authorization: Bearer 6d151216ef504f65b8ff6e9e9e8356d3"
+                            -H "Content-Type: application/json" 
+                            -d {"name": "CASH", "type": "Cash"} "https://hemis.edu.mn/api/2.0/incidents"
+                            '
+                -  
+                    lang: Java
+                    source: |-
+                            OkHttpClient client = new OkHttpClient();
+
+                            MediaType mediaType = MediaType.parse("application/json");
+                            Request request = new Request.Builder()
+                            .url("https://hemis.edu.mn/api/2.0/incidents")
+                            .get()
+                            .addHeader("Authorization", "Bearer 6d151216ef504f65b8ff6e9e9e8356d3")
+                            .addHeader("content-type", "application/json")
+                            .addHeader("cache-control", "no-cache")
+                            .build();
+
+                            Response response = client.newCall(request).execute();
+        post:
+            operationId: createIncidents
+            summary: Ослын бүртгэл үүсгэх
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/incidents-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/incidents-item'
+            produces:
+                - application/json
+            tags:
+                - Ослын бүртгэл
+            x-internal-id: hemis-api-2.0-incidents-post     
+    /incidents/{id}:   
+        get:
+            operationId: getIncidents
+            summary: Ослын бүртгэлийн  мэдээлэл
+            description: ''
+            parameters:
+                - 
+                    name: expand
+                    description: 'Энэ параметрыг ашигласан үед сервер тодорхойлсон харъяалагдах нөөцийг буцаах ба нэгээс олон харъяалагдах нөөцийг буцаах бол таслалаар хязгаарлан тоочиж өгнө. Жишээ нь: ?expand=Employees,Localizations. Харин бүх харъяалагдах нөөцийг авах бол ?expand=all гэж ашиглана.'
+                    in: query
+                    type: string
+                - 
+                    name: fields
+                    description: 'Энэ параметр нь тухайн нөөцийн багануудыг шүүхэд ашиглагдана. Сервер зөвхөн тодорхойлсон баганы мэдээллийг буцаана. Мөн харъяалагдах нөөцийн баганыг шүүж авч болно. Жишээ нь: "?fields=legalEntityName;legalEntities.businessUnits:businessUnitName" нь legalEntityName болон харъяалагдах Салбар нэгж нөөцийн businessUnitName гэсэн баганыг харуулна. <br><br>Ашиглах загвар: ?fields=Attribute1,Attribute2<br><br>Харъяалагдах нөөцийн хувьд: ?fields=Child1:Attribute1,Attribute2'
+                    in: query
+                    type: string
+                - 
+                    name: onlyData
+                    description: 'Зөвхөн өгөгдөл харуулна (Жишээ нь линкийн хэсгийг харуулахгүй).'
+                    in: query
+                    type: boolean
+                - 
+                    name: dependency
+                    description: 'Энэ параметр нь хоорондоо хамааралтай багануудын хамаарлыг тодорхойлно. Жишээ нь: dependency=ProductId=2<br><br>Ашиглах формат: &lt;attr1&gt;=&lt;val1&gt;,&lt;attr2&gt;=&lt;value2&gt;'
+                    in: query
+                    type: string
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/incidents-item'
+            produces:
+                - application/json
+            tags:
+                - Ослын бүртгэл
+            x-internal-id: hemis-api-2.0-incidents-{id}-get            
+        patch:
+            operationId: updateIncidents
+            summary: Ослын бүртгэлийн мэдээлэл засах
+            description: ''
+            parameters:
+                - 
+                    name: payload
+                    description: 'Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.'
+                    in: body
+                    type: string
+                    schema:
+                        $ref: '#/definitions/incidents-item'
+            responses:
+                default:
+                    description: Үндсэн буцаах дата нь дараах хүснэгтэд тодорхойлсны дагуу байна.
+                    schema:
+                        $ref: '#/definitions/incidents-item'
+            produces:
+                - application/json
+            tags:
+                - Ослын бүртгэл
+            x-internal-id: hemis-api-2.0-incidents-{id}-patch
+        delete:
+            operationId: deleteIncidents
+            summary: Ослын бүртгэл устгах
+            description: ''
+            responses:
+                204:
+                    description: Харуулах мэдээлэл байхгүй.
+            produces:
+                - application/json
+            tags:
+                - Ослын бүртгэл
+            x-internal-id: hemis-api-2.0-incidents-{id}-delete
+            parameters:
+                - 
+                    name: id
+                    description: '
+                    <p>Энэ параметр нь тухайн нөөцийн анхдагч түлхүүрийн мэдээллээс сервер шифрлэн үүсгэсэн <code>hash key</code> ба тухайн бичлэгийг давхцахгүй байдлаар бүрэн илэрхийлнэ.</p>
+                    <p>Хэрэв тухайн нөөцөөс анхдагч түлхүүр ашиглан мэдээлэл авах бол <code>q</code> параметр ашиглах ба дараах хэлбэртэй байна:</p>
+                    <code>/&lt;resourceName&gt;?q=PrimaryKey1=&lt;value1&gt;;PrimaryKey2=&lt;value2&gt;;PrimaryKey3=&lt;value3&gt;</code>
+                    <br>
+                    <p>Тайлбар:</p>
+                    <ul>
+                        <li><code>/&lt;resourceName&gt;</code> хэсэгт веб сервисийн нөөцийн нэр байна.</li>
+                        <li><code>PrimaryKey1, PrimaryKey2, PrimaryKey3</code> хэсэгт анхдагч түлхүүрийн баганы нэр байна.</li>
+                        <li><code>&lt;value1&gt;, &lt;value2&gt;, &lt;value3&gt;</code> хэсэгт анхдагч түлхүүрээр шүүх утга бичнэ.</li>
+                    </ul>
+                    <br>
+                    <p>Албан байгууллагын анхдагч түлхүүрээр шүүхдээ дараах хэлбэрээр шүүнэ:</p>
+                    <code>/legalEntities?q=LegalEntityId=&lt;value1&gt;;EffectiveStartDate=&lt;value2&gt;;EffectiveEndDate=&lt;value3&gt;</code>
+                    '
+                    required: true
+                    in: path
+                    type: string
+                                                                                                                                                          
     /legalEntities:
         get:
             operationId: getLegalEntities
@@ -10078,6 +10290,312 @@ definitions:
                 type: string
                 description: 'Нөөцийн линкний төрлийг заана. Жишээ нь: item, collection, attachment.'
                 title: Нөөцийн линкний төрөл
+    incidents:
+        type: object
+        properties:
+            count:
+                title: Count
+                description: Тухайн хязгаарт ирж байгаа нөөцийн тоо.
+                type: integer
+            hasMore:
+                title: HasMore
+                description: 'Ирж байгаа хязгаараас илүү нөөц байгаа эсэх. Хэрэв байвал true, үгүй бол false байна.'
+                type: boolean
+            offset:
+                title: Offset
+                description: Серверээс авах нөөцийн хязгаарын эхлэх байршил.
+                type: integer
+            limit:
+                title: Limit
+                description: Серверээс авах нөөцийн хязгаарын тоо.
+                type: integer
+            items:
+                title: Items
+                description: Жагсаалтад байгаа нөөцийн мэдээлэл.
+                type: array
+                items:
+                    $ref: '#/definitions/incidents-item'
+            links:
+                title: Items
+                description: Объектын мэдээлэлтэй холбоотой линкүүд.
+                type: array
+                items:
+                    $ref: '#/definitions/link'    
+    incidents-item:
+        properties:
+            EnterpriseId:
+                format: int64
+                type: integer
+                description: Интерпрайзын ID
+                title: Интерпрайзын ID
+            IncidentId:
+                format: int64
+                type: integer
+                description: Ослын бүртгэлийн ID
+                title: Ослын бүртгэлийн ID
+            EffectiveStartDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр эхлэх огноо
+                title: Хүчин төгөлдөр эхлэх огноо
+            EffectiveEndDate:
+                format: date-time
+                type: string
+                description: Хүчин төгөлдөр дуусах огноо
+                title: Хүчин төгөлдөр дуусах огноо
+            LegalEntityId:
+                format: int64
+                type: integer
+                description: Албан байгууллагын ID  
+                title: Албан байгууллагын ID
+            ActionId:
+                format: int64
+                type: integer
+                description: Үйлдлийн ID
+                title: Үйлдлийн ID  
+            AbsenceId:
+                format: int64
+                type: integer
+                description: Чөлөөний бүртгэлийн ID
+                title: Чөлөөний бүртгэлийн ID      
+            ActionReasonId:
+                format: int64
+                type: integer
+                description: Үйлдлийн шалтгааны ID
+                title: Үйлдлийн шалтгааны ID   
+            WorkerId:
+                format: int64
+                type: integer
+                description: Ажилтны ID
+                title: Ажилтны ID  
+            WorkerEmploymentId:
+                format: int64
+                type: integer
+                description: Ажилтны ажил эрхлэлтийн ID
+                title: Ажилтны ажил эрхлэлтийн ID 
+            IncidentType:
+                title: Ослын бүртгэлийн төрөл 
+                maxLength: 30
+                type: string
+                description: Ослын бүртгэлийн төрөл      
+            DiseaseType:
+                title: Өвчин эмгэгийн төрөл 
+                maxLength: 30
+                type: string
+                description: Өвчин эмгэгийн төрөл  
+            DeathFlag:
+                title: Нас барсан эсэх
+                maxLength: 30
+                type: string
+                description: Нас барсан эсэх             
+            IncidentDate:
+                format: date-time
+                type: string
+                description: Осол болсон огноо
+                title: Осол болсон огноо     
+            IncidentTime:
+                format: date-time
+                type: string
+                description: Осол болсон цаг
+                title: Осол болсон цаг    
+            IncidentLocationType:
+                title: Осол болсон байршилын төрөл 
+                maxLength: 30
+                type: string
+                description: Осол болсон байршилын төрөл  
+            IncidentLocation:
+                title: Осол болсон байршил
+                maxLength: 4000
+                type: string
+                description: Осол болсон байршил
+            ReportMethod:
+                title: Мэдээлсэн хэлбэр
+                maxLength: 30
+                type: string
+                description: Мэдээлсэн хэлбэр 
+            ReportDate:
+                format: date-time
+                type: string
+                description: Мэдээлсэн огноо
+                title: Мэдээлсэн огноо        
+            ReportTime:
+                title: Мэдээлсэн цаг 
+                maxLength: 5
+                type: string
+                description: Мэдээлсэн цаг 
+            ReportPersonId:
+                format: int64
+                type: integer
+                description: Мэдээлсэн хүний ID
+                title: Мэдээлсэн хүний ID    
+            ReportPersonName:
+                title: Мэдээлсэн хүний нэр
+                maxLength: 240
+                type: string
+                description: Мэдээлсэн хүний нэр 
+            ReportPersonJobTitle:
+                title: Мэдээлсэн хүний албан тушаал
+                maxLength: 2000
+                type: string
+                description: Мэдээлсэн хүний албан тушаал 
+            ReportPersonPhones:
+                title: Мэдээлсэн хүний утасны дугаар
+                maxLength: 240
+                type: string
+                description: Мэдээлсэн хүний утасны дугаар
+            ReportDetails:
+                title: Мэдээлсэн дэлгэрэнгүй мэдээлэл
+                maxLength: 4000
+                type: string
+                description: Мэдээлсэн дэлгэрэнгүй мэдээлэл
+            ReportedToPersonId:
+                format: int64
+                type: integer
+                description: Мэдээлэл хүлээн авсан хүний ID
+                title: Мэдээлэл хүлээн авсан хүний ID     
+            WitnessDetails:
+                title: Гэрчүүдийн мэдээлэл
+                maxLength: 4000
+                type: string
+                description: Гэрчүүдийн мэдээлэл 
+            BodyPart:
+                title: Гэмтсэн биеийн хэсэг
+                maxLength: 4000
+                type: string
+                description: Гэмтсэн биеийн хэсэг 
+            InvolvedObjects:
+                title: Осолтой холбоотой объектууд
+                maxLength: 4000
+                type: string
+                description: Осолтой холбоотой объектууд   
+            TreatmentReceivedFlag:
+                title: Нас барсан эсэх
+                maxLength: 1
+                type: string
+                description: Эрүүл мэндийн тусламж авсан эсэх
+            DoctorPersonId:
+                format: int64
+                type: integer
+                description: Эмчийн хүний ID
+                title: Эмчийн хүний ID    
+            DoctorPersonName:
+                title: Эмчийн нэр
+                maxLength: 240
+                type: string
+                description: Эмчийн нэр 
+            DeathDate:
+                format: date-time
+                type: string
+                description: Нас барсан огноо
+                title: Нас барсан огноо 
+            DoctorPersonJobTitle:
+                title: Эмчийн албан тушаал
+                maxLength: 2000
+                type: string
+                description: Эмчийн албан тушаал 
+            DoctorPersonPhones:
+                title: Эмчийн утасны дугаар
+                maxLength: 240
+                type: string
+                description: Эмчийн утасны дугаар 
+            HospitalizedFlag:
+                title: Эмнэлэгт хэвтсэн эсэх
+                maxLength: 1
+                type: string
+                description: Эмнэлэгт хэвтсэн эсэх   
+            HospitalName:
+                title: Эмнэлэгийн нэр
+                maxLength: 240
+                type: string
+                description: Эмнэлэгийн нэр   
+            HazardType:
+                title: Аюулын төрөл
+                maxLength: 30
+                type: string
+                description: Аюулын төрөл   
+            HospitalAddress:
+                title: Эмнэлэгийн хаяг
+                maxLength: 4000
+                type: string
+                description: Эмнэлэгийн хаяг      
+            HospitalDetails:
+                title: Эмнэлэгийн дэлгэрэнгүй мэдээлэл
+                maxLength: 4000
+                type: string
+                description: Эмнэлэгийн дэлгэрэнгүй мэдээлэл 
+            PrivacyIssueFlag:
+                title: Хувийн асуудалтай холбоотой эсэх 
+                maxLength: 1
+                type: string
+                description: Хувийн асуудалтай холбоотой эсэх      
+            CompensationFlag:
+                title: Тэтгэмж олгосон эсэх
+                maxLength: 1
+                type: string
+                description: Тэтгэмж олгосон эсэх 
+            CompensationCurrency:
+                title: Тэтгэмжийн вальют
+                maxLength: 30
+                type: string
+                description: Тэтгэмжийн вальют
+            CompensationAmount:
+                format: number
+                type: string
+                description: Тэтгэмжийн мөнгөн дүн
+                title: Тэтгэмжийн мөнгөн дүн    
+            CompensationDate:
+                format: date-time
+                type: string
+                description: Тэтгэмж олгосон огноо
+                title: Тэтгэмж олгосон огноо              
+            AbsenceFlag:
+                title: Чөлөө авсан эсэх 
+                maxLength: 1
+                type: string
+                description: Чөлөө авсан эсэх                                                                                                                                                                                                          
+            ActionDate:
+                format: date-time
+                type: string
+                description: Үйлдэл хийсэн огноо
+                title: Үйлдэл хийсэн огноо                                                                                                                                                                     
+            Status:
+                title: Төлөв
+                maxLength: 1
+                type: string
+                description: Төлөв
+            ObjectVersionNumber:
+                format: int32
+                type: integer
+                description: Объектын өөрчлөлтийн дугаар. Өөрчлөлт хийгдэх бүрт энэ дугаар нь 1-ээр нэмэгдэнэ.
+                title: Өөрчлөлтийн дугаар
+            CreatedBy:
+                title: Үүсгэсэн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг үүсгэсэн хэрэглэгч
+            CreatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг үүсгэсэн өдөр, цаг, минут.
+                title: Үүсгэсэн огноо
+            LastUpdatedBy:
+                title: Сүүлд өөрчилсөн хэрэглэгч
+                maxLength: 64
+                type: string
+                description: Бичлэг сүүлд өөрчилсөн хэрэглэгч
+            LastUpdatedDate:
+                format: date-time
+                type: string
+                description: Тухайн бичлэгийг өөрчилсөн сүүлийн өдөр, цаг, минут.
+                title: Сүүлд өөрчилсөн огноо
+            
+            links:
+                items:
+                    $ref: '#/definitions/link'
+                type: array
+                description: Link Relations
+                title: Items
+        type: object                                     
     calendars:
         type: object
         properties:
